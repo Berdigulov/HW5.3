@@ -3,6 +3,7 @@ package com.example.hw53
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.recyclerview.widget.RecyclerView
 import com.example.hw53.databinding.ActivityMainBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -10,7 +11,7 @@ import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private var adapter = ImageAdapter(arrayListOf())
+    private var imageAdapter=ImageAdapter(mutableListOf())
     private var page:Int = 1
 
 
@@ -25,32 +26,42 @@ class MainActivity : AppCompatActivity() {
         with(binding){
 
             btnNext.setOnClickListener {
-                ++page
-                doRequest()
+                doRequest(++page)
             }
 
             btnFind.setOnClickListener {
-                doRequest()
+                doRequest(page)
 
             }
+            recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (!recyclerView.canScrollVertically(1)) {
+                        doRequest(++page)
+
+
+                    }
+                }
+            })
         }
     }
 
-    private fun ActivityMainBinding.doRequest() {
+    private fun ActivityMainBinding.doRequest(page:Int) {
         RetrofitService.api.getImage(etPhoto.text.toString(), page = page)
             .enqueue(object : Callback<PixaModel> {
                 override fun onResponse(call: Call<PixaModel>, response: Response<PixaModel>) {
                     if (response.isSuccessful) {
-                        adapter = ImageAdapter(response.body()!!.hits as ArrayList<ImageModel>)
-                        binding.recycler.adapter = this@MainActivity.adapter
-                    }
+                        response.body()?.hits.let {
+                            imageAdapter = ImageAdapter(it!!)
+                            recycler.adapter = imageAdapter
+                        }
                     Log.e("ololo", "onResponse: ${response.body()!!.hits[0].largeImageURL}")
                 }
-
+            }
                 override fun onFailure(call: Call<PixaModel>, t: Throwable) {
-                    Log.e("ololo", "onFailure: ${t.message}")
+                    Log.e("ololo", "onFailure: ${t.message}", )
                 }
-
             })
-    }
+
+}
 }
