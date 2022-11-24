@@ -11,7 +11,7 @@ import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private var imageAdapter=ImageAdapter(mutableListOf())
+    private var imageAdapter=ImageAdapter(arrayListOf())
     private var page:Int = 1
 
 
@@ -51,17 +51,19 @@ class MainActivity : AppCompatActivity() {
             .enqueue(object : Callback<PixaModel> {
                 override fun onResponse(call: Call<PixaModel>, response: Response<PixaModel>) {
                     if (response.isSuccessful) {
-                        response.body()?.hits.let {
-                            imageAdapter = ImageAdapter(it!!)
-                            recycler.adapter = imageAdapter
-                        }
+                        response.body()?.hits?.let {
+                            it.forEach{
+                                imageAdapter.addImage(it)
+                            }
+                            binding.recycler.adapter = imageAdapter
                     Log.e("ololo", "onResponse: ${response.body()!!.hits[0].largeImageURL}")
                 }
+            }
             }
                 override fun onFailure(call: Call<PixaModel>, t: Throwable) {
                     Log.e("ololo", "onFailure: ${t.message}", )
                 }
-            })
 
+            })
 }
 }

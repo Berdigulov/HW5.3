@@ -8,7 +8,7 @@ import androidx.viewbinding.ViewBinding
 import coil.load
 import com.example.hw53.databinding.ItemImageBinding
 
-class ImageAdapter(private val list:List<ImageModel>) : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>(){
+class ImageAdapter(private val list:ArrayList<ImageModel>) : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>(){
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
@@ -28,6 +28,10 @@ class ImageAdapter(private val list:List<ImageModel>) : RecyclerView.Adapter<Ima
 
 
         }
+    }
+
+    fun addImage(Image : ImageModel) {
+        list.add(Image)
     }
 
 
